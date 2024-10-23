@@ -5,7 +5,7 @@ run-name: >-
 on:
   pull_request:
     types: [opened, synchronize]
-    branches: [main]
+    branches: main
   issue_comment:
     types: [created]
 
@@ -20,6 +20,16 @@ jobs:
     permissions: write-all
 
     steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
       - name: Yamllint Github Action
-        uses: karancode/yamllint-github-action@v2.1.1
+        uses: github/super-linter/slim@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+
         
