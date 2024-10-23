@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Yamllint Github Action
-        uses: github/super-linter@main
+        uses: github/super-linter/slim@main
         
 
         
