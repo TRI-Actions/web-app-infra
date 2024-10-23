@@ -20,6 +20,11 @@ jobs:
     permissions: write-all
 
     steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || '' }}
+
       - name: Yamllint Github Action
         uses: github/super-linter@v7
         env:
