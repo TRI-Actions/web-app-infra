@@ -5,7 +5,7 @@ run-name: >-
 on:
   pull_request:
     types: [opened, synchronize]
-    branches: [main]
+    branches: main
   issue_comment:
     types: [created]
 
@@ -23,7 +23,7 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Yamllint Github Action
         uses: github/super-linter/slim@main
