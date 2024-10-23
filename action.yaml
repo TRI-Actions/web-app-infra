@@ -425,7 +425,6 @@ runs:
       uses: actions/github-script@v6
       if: ${{ job.status == 'success' && github.event.issue.pull_request && contains(github.event.comment.body, 'GithubDeploy') }}
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
             github.rest.pulls.merge({
               owner: context.repo.owner,
