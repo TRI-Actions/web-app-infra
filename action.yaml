@@ -5,14 +5,8 @@ branding:
   color: 'blue'
 
 inputs:
-  pull_request:
+  ref:
     description: github.event.issue.pull_request
-    required: true
-  head_ref:
-    description: refs/pull/{0}/head
-    required: true
-  issue_number:
-    description: github.event.issue.number
     required: true
 
 runs:
@@ -21,7 +15,7 @@ runs:
     - name: Check out repository code
       uses: actions/checkout@v3
       with:
-        ref: ${{ github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || '' }}
+        ref: ${{ inputs.ref }}
 
     - name: Get Head Sha
       id: sha
