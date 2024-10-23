@@ -4,11 +4,6 @@ branding:
   icon: 'chevron-right'
   color: 'blue'
 
-inputs:
-  ref:
-    description:  github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || ''
-    required: true
-
 runs:
   using: composite
   steps:
