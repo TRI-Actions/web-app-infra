@@ -21,7 +21,10 @@ jobs:
 
     steps:
       - name: Yamllint Github Action
-        uses: github/super-linter/slim@main
+        uses: github/super-linter@v7
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
 
         
