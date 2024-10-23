@@ -27,7 +27,8 @@ jobs:
 
       - name: Yamllint Github Action
         uses: github/super-linter/slim@main
-
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
 
         
