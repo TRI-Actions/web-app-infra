@@ -1,0 +1,25 @@
+name: main_update
+run-name: >-
+  ${{ github.event.issue.number && format('Main_update | PR-{0}', github.event.issue.number)
+  || 'Deployment' }}
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches: [main]
+  issue_comment:
+    types: [created]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pipeline:
+    runs-on: codebuild-test-codebuild-runner-web-app-infra-${{ github.run_id }}-${{ github.run_attempt }}
+    name: ${{ github.event.issue.pull_request && 'deploy' || 'plan' }}
+    permissions: write-all
+
+    steps:
+      - name: Yamllint Github Action
+        uses: karancode/yamllint-github-action@v2.1.1
+        
