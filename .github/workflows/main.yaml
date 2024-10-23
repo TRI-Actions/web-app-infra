@@ -27,7 +27,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Yamllint Github Action
-        uses: github/super-linter/slim@main
+        uses: github/super-linter@v7
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
