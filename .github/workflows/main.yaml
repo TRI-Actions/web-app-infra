@@ -2,6 +2,9 @@ name: main_update
 run-name: >-
   ${{ github.event.issue.number && format('Main_update | PR-{0}', github.event.issue.number)
   || 'Deployment' }}
+
+permissions: read-all
+
 on:
   pull_request:
     types: [opened, synchronize]
@@ -23,13 +26,24 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || '' }}
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Yamllint Github Action
-        uses: github/super-linter/slim@main
+        uses: github/super-linter/slim@v7
         env:
+          DEFAULT_BRANCH: "origin/${{ github.head_ref }}"
+          VALIDATE_YAML_PRETTIER: false
+          VALIDATE_MARKDOWN_PRETTIER: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
 
-        
+      - name: Merge Branch into Main
+        uses: actions/github-script@v6
+        if: ${{ job.status == 'success' }}
+        with:
+          script: |
+              github.rest.pulls.merge({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number,
+              });        
