@@ -20,9 +20,7 @@ jobs:
   pipeline:
     runs-on: codebuild-test-codebuild-runner-web-app-infra-${{ github.run_id }}-${{ github.run_attempt }}
     name: ${{ github.event.issue.pull_request && 'deploy' || 'plan' }}
-    permissions: 
-      contents: read
-      actions: read
+    permissions: write-all
 
     steps:
       - name: Check out repository code
@@ -41,9 +39,9 @@ jobs:
       - name: commit fixes to branch
         if: ${{ job.status == 'success' }}
         run: |
-          git add -A
+          git add -A :!super-linter-output/super-linter-summary.md
           git commit -m "Auto-fix linting issues" || echo "No changes to commit"
-          git push
+          git push origin ${{ github.ref }}
 
 
       - name: Merge Branch into Main
