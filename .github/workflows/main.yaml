@@ -33,19 +33,7 @@ jobs:
         uses: github/super-linter/slim@v7
         env:
           DEFAULT_BRANCH: "origin/${{ github.head_ref }}"
-          FIX_YAML_PRETTIER: true
-          FIX_MARKDOWN_PRETTIER: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: commit fixes to branch
-        if: ${{ job.status == 'success' }}
-        env: 
-          REF: ${{ github.head_ref }}
-        run: |
-          git add -A :!super-linter-output/super-linter-summary.md
-          git commit -m "Auto-fix linting issues" || echo "No changes to commit"
-          git push origin "HEAD:${REF}"
-
 
       - name: Merge Branch into Main
         uses: actions/github-script@v6
