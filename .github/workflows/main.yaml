@@ -18,8 +18,8 @@ jobs:
     runs-on: codebuild-test-codebuild-runner-web-app-infra-${{ github.run_id }}-${{ github.run_attempt }}
     name: ${{ github.event.issue.pull_request && 'deploy' || 'plan' }}
     permissions: 
-      contents: write
-      actions: write
+      contents: read
+      actions: read
 
     steps:
       - name: Check out repository code
@@ -30,8 +30,7 @@ jobs:
       - name: Yamllint Github Action
         uses: github/super-linter/slim@v7
         env:
-          FIX_YAML_PRETTIER: true
-          FIX_MARKDOWN_PRETTIER: true
+          DEFAULT_BRANCH: origin/main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Merge Branch into Main
