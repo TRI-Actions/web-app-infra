@@ -17,7 +17,6 @@ jobs:
   pipeline:
     runs-on: codebuild-test-codebuild-runner-web-app-infra-${{ github.run_id }}-${{ github.run_attempt }}
     name: ${{ github.event.issue.pull_request && 'deploy' || 'plan' }}
-    permissions: write-all
 
     steps:
       - name: Check out repository code
@@ -26,8 +25,9 @@ jobs:
           fetch-depth: 0
 
       - name: Yamllint Github Action
-        uses: github/super-linter@v7
+        uses: github/super-linter/slim@v7
         env:
           FIX_YAML_PRETTIER: true
+          FIX_MARKDOWN_PRETTIER: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
