@@ -43,7 +43,7 @@ jobs:
         run: |
           git add -A :!super-linter-output/super-linter-summary.md
           git commit -m "Auto-fix linting issues" || echo "No changes to commit"
-          git push origin ${REF}
+          git push origin "${REF}"
 
 
       - name: Merge Branch into Main
