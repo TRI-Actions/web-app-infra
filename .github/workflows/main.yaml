@@ -39,21 +39,22 @@ jobs:
       - name: commit fixes to branch
         if: ${{ job.status == 'success' }}
         env: 
-          REF: ${{ github.head_ref }}
+          REF: ${{ github.ref }}
         run: |
           git add -A :!super-linter-output/super-linter-summary.md
           git commit -m "Auto-fix linting issues" || echo "No changes to commit"
-          git push origin "$REF"
+          echo "Current branch is ${REF}"
+          # git push origin ${REF}
 
 
-      - name: Merge Branch into Main
-        uses: actions/github-script@v6
-        if: ${{ job.status == 'success' }}
-        with:
-          script: |
-              github.rest.pulls.merge({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: context.issue.number,
-              });
+#      - name: Merge Branch into Main
+#        uses: actions/github-script@v6
+#        if: ${{ job.status == 'success' }}
+#        with:
+#          script: |
+#              github.rest.pulls.merge({
+#                owner: context.repo.owner,
+#                repo: context.repo.repo,
+#                pull_number: context.issue.number,
+#              });
         
