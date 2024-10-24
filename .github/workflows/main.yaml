@@ -33,6 +33,8 @@ jobs:
         uses: github/super-linter/slim@v7
         env:
           DEFAULT_BRANCH: "origin/${{ github.head_ref }}"
+          VALIDATE_YAML_PRETTIER: false
+          VALIDATE_MARKDOWN_PRETTIER: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Merge Branch into Main
