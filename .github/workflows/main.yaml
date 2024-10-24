@@ -26,6 +26,7 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.head_ref }}
           fetch-depth: 0
 
       - name: Yamllint Github Action
@@ -43,7 +44,6 @@ jobs:
         run: |
           git add -A :!super-linter-output/super-linter-summary.md
           git commit -m "Auto-fix linting issues" || echo "No changes to commit"
-          git fetch origin "${REF}"
           git push origin "${REF}"
 
 
