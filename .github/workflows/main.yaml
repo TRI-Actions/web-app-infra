@@ -30,4 +30,15 @@ jobs:
           FIX_YAML_PRETTIER: true
           FIX_MARKDOWN_PRETTIER: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Merge Branch into Main
+        uses: actions/github-script@v6
+        if: ${{ job.status == 'success' }}
+        with:
+          script: |
+              github.rest.pulls.merge({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number,
+              });
         
