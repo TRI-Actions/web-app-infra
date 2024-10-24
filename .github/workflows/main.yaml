@@ -31,8 +31,17 @@ jobs:
         uses: github/super-linter/slim@v7
         env:
           DEFAULT_BRANCH: origin/main
+          DEFAULT_AUTO_FIX: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+
+      - name: commit fixes to branch
+        if: ${{ job.status == 'success' }}
+        run: |
+          git add -A
+          git commit -m "Auto-fix linting issues" || echo "No changes to commit"
+          git push
+
+
       - name: Merge Branch into Main
         uses: actions/github-script@v6
         if: ${{ job.status == 'success' }}
