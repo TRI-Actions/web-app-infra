@@ -1,7 +1,7 @@
 name: main_update
 run-name: >-
   ${{ github.event.issue.number && format('Main_update | PR-{0}', github.event.issue.number)
-  || 'Deployment' }}
+  || 'Main Branch Update' }}
 
 permissions: read-all
 
@@ -35,7 +35,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "If you would like to test your changes, comment `test` on your branch"
+              body: "If you would like to test your changes, comment `test` on your branch. Pipeline will pull the latest from branch `test`"
             })
 
       - name: Yamllint Github Action
