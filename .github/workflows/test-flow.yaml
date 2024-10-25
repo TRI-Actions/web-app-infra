@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  pipeline:
+  test-pipeline:
     runs-on: codebuild-test-codebuild-runner-web-app-infra-${{ github.run_id }}-${{ github.run_attempt }}
     name: test-workflow
     permissions: write-all
