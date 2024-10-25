@@ -1,0 +1,33 @@
+name: Test-flow
+run-name: >-
+  ${{ github.event.issue.number && format('test_flow | PR-{0}', github.event.issue.number)
+  || 'Test Deployment' }}
+
+permissions: read-all
+
+on:
+  issue_comment:
+    types: [created]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pipeline:
+    runs-on: codebuild-test-codebuild-runner-web-app-infra-${{ github.run_id }}-${{ github.run_attempt }}
+    name: test-workflow
+    permissions: write-all
+
+
+    ############## Test your branch by pushing to the test branch of this repo ############################
+    steps:
+      - name: Run Composite Module
+        uses: infrastructure/web-app-infra@test
+
+      - name: Terraform destroy
+        id: destroy
+        shell: bash
+        run: terraform destroy
+        continue-on-error: true
+        working-directory: terraform

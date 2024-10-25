@@ -9,8 +9,6 @@ on:
   pull_request:
     types: [opened, synchronize]
     branches: main
-  issue_comment:
-    types: [created]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -19,7 +17,7 @@ concurrency:
 jobs:
   pipeline:
     runs-on: codebuild-test-codebuild-runner-web-app-infra-${{ github.run_id }}-${{ github.run_attempt }}
-    name: ${{ github.event.issue.pull_request && 'deploy' || 'plan' }}
+    name: linting
     permissions: write-all
 
     steps:
@@ -29,6 +27,17 @@ jobs:
           ref: ${{ github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || '' }}
           fetch-depth: 0
 
+      - name: Alert User to tests
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: "If you would like to test your changes, comment `test` on your branch"
+            })
+
       - name: Yamllint Github Action
         uses: github/super-linter/slim@v7
         env:
@@ -37,13 +46,4 @@ jobs:
           VALIDATE_MARKDOWN_PRETTIER: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Merge Branch into Main
-        uses: actions/github-script@v6
-        if: ${{ job.status == 'success' }}
-        with:
-          script: |
-              github.rest.pulls.merge({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: context.issue.number,
-              });        
+      
