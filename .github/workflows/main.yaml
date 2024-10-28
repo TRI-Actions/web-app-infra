@@ -1,7 +1,7 @@
 name: main_update
 run-name: >-
-  ${{ github.event.issue.number && format('Main_update | PR-{0}', github.event.issue.number)
-  || 'Main Branch Update' }}
+  ${{ github.event.issue.number && format('web_app_infra_update | PR-{0}', github.event.issue.number)
+  || 'web-app-infra Branch Update' }}
 
 permissions: read-all
 
