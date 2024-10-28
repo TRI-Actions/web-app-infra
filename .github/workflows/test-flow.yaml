@@ -26,6 +26,7 @@ jobs:
         uses: infrastructure/web-app-infra@test
 
       - name: Terraform destroy
+        if: always()
         id: destroy
         shell: bash
         run: terraform destroy -auto-approve
