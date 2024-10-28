@@ -38,7 +38,7 @@ jobs:
               body: "If you would like to test your changes, comment `test` on your branch. Pipeline will pull the latest from branch `test`"
             })
 
-      - name: Yamllint Github Action
+      - name: Basic Linting
         uses: github/super-linter/slim@v7
         env:
           DEFAULT_BRANCH: "origin/${{ github.head_ref }}"
