@@ -28,6 +28,6 @@ jobs:
       - name: Terraform destroy
         id: destroy
         shell: bash
-        run: terraform destroy
+        run: terraform destroy -auto-approve
         continue-on-error: true
         working-directory: terraform
