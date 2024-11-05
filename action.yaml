@@ -223,7 +223,13 @@ runs:
         terraform plan -no-color -var-file globals/globals.tfvars -var-file ${{ steps.get-label.outputs.environment }}/${{ steps.get-label.outputs.environment }}.tfvars -out=${GITHUB_WORKSPACE}/plan.tfplan
         terraform show -no-color ${GITHUB_WORKSPACE}/plan.tfplan > ${GITHUB_WORKSPACE}/plan.out
       working-directory: terraform
-    
+
+    - name: Terraform Unlock
+      id: unlock
+      uses: infrastructure/terraform-unlock
+      with:
+        output_file: ${GITHUB_WORKSPACE}/plan.out
+
     - name: Post plan outputs and update status check
       if: always() && !contains(github.event.comment.body, 'GithubDeploy')
       uses: actions/github-script@v6
@@ -309,6 +315,12 @@ runs:
       run: |
         terraform apply -auto-approve -no-color ${GITHUB_WORKSPACE}/plan.tfplan > ${GITHUB_WORKSPACE}/apply.out
       working-directory: terraform
+
+    - name: Terraform Unlock
+      id: unlock
+      uses: infrastructure/terraform-unlock
+      with:
+        output_file: ${GITHUB_WORKSPACE}/apply.out
 
     - name: Post apply outputs and update status check
       if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, 'GithubDeploy') && always() }}
