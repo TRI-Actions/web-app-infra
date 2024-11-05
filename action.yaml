@@ -220,29 +220,32 @@ runs:
       id: plan
       shell: bash
       run: |
-        terraform plan -json -var-file globals/globals.tfvars -var-file ${{ steps.get-label.outputs.environment }}/${{ steps.get-label.outputs.environment }}.tfvars > error.out
-        ERROR_OUTPUT=$(cat error.out)
-        if [[ $ERROR_OUTPUT == *"Error acquiring the state lock"* ]]; then
-          LOCK_ID=$(echo $ERROR_OUTPUT | jq -r .diagnostic.detail | grep -A 1 "Lock Info" | awk '/ID:/ {print $2; exit}')
-          echo "State is locked. Lock ID:"
-          echo "$LOCK_ID"
+        check_lock() {
+          terraform plan -json -var-file globals/globals.tfvars -var-file ${{ steps.get-label.outputs.environment }}/${{ steps.get-label.outputs.environment }}.tfvars > error.out
+          ERROR_OUTPUT=$(cat error.out)
+          if [[ $ERROR_OUTPUT == *"Error acquiring the state lock"* ]]; then
+            LOCK_ID=$(echo $ERROR_OUTPUT | jq -r .diagnostic.detail | grep -A 1 "Lock Info" | awk '/ID:/ {print $2; exit}')
+            echo "State is locked. Lock ID:"
+            echo "$LOCK_ID"
 
-          echo "Attempting to unlock terraform state"
-          if terraform force-unlock --force "${LOCK_ID}"; then
-            echo "Terraform state has been successfully unlocked!"
-          else
-            echo "Failed to unlock the state."
+            echo "Attempting to unlock terraform state"
+            if terraform force-unlock --force "${LOCK_ID}"; then
+              echo "Terraform state has been successfully unlocked!"
+            else
+              echo "Failed to unlock the state."
+              return 1
+            fi
+          elif [[ $ERROR_OUTPUT == *"Error:"* ]]; then
+            echo "Error occurred while checking Terraform state:"
+            echo "$ERROR_OUTPUT"
             return 1
+          else
+            echo "State is not locked. No action needed."
+            terraform plan -no-color -var-file globals/globals.tfvars -var-file ${{ steps.get-label.outputs.environment }}/${{ steps.get-label.outputs.environment }}.tfvars -out=${GITHUB_WORKSPACE}/plan.tfplan
+            terraform show -no-color ${GITHUB_WORKSPACE}/plan.tfplan > ${GITHUB_WORKSPACE}/plan.out
           fi
-        elif [[ $ERROR_OUTPUT == *"Error:"* ]]; then
-          echo "Error occurred while checking Terraform state:"
-          echo "$ERROR_OUTPUT"
-          return 1
-        else
-          echo "State is not locked. No action needed."
-          terraform plan -no-color -var-file globals/globals.tfvars -var-file ${{ steps.get-label.outputs.environment }}/${{ steps.get-label.outputs.environment }}.tfvars -out=${GITHUB_WORKSPACE}/plan.tfplan
-          terraform show -no-color ${GITHUB_WORKSPACE}/plan.tfplan > ${GITHUB_WORKSPACE}/plan.out
-        fi
+        }
+        check_lock
       working-directory: terraform
 
     - name: Post plan outputs and update status check
