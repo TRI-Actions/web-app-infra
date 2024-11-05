@@ -220,15 +220,29 @@ runs:
       id: plan
       shell: bash
       run: |
-        terraform plan -no-color -var-file globals/globals.tfvars -var-file ${{ steps.get-label.outputs.environment }}/${{ steps.get-label.outputs.environment }}.tfvars -out=${GITHUB_WORKSPACE}/plan.tfplan
-        terraform show -no-color ${GITHUB_WORKSPACE}/plan.tfplan > ${GITHUB_WORKSPACE}/plan.out
-      working-directory: terraform
+        ERROR_OUTPUT=$(terraform plan -json -var-file globals/globals.tfvars -var-file ${{ steps.get-label.outputs.environment }}/${{ steps.get-label.outputs.environment }}.tfvars -out=${GITHUB_WORKSPACE}/plan.tfplan 2>&1)
+        if [[ $ERROR_OUTPUT == *"Error acquiring the state lock"* ]]; then
+          LOCK_ID=$(echo $ERROR_OUTPUT | jq -r .diagnostic.detail | grep -A 1 "Lock Info" | awk '/ID:/ {print $2; exit}')
+          echo "State is locked. Lock ID:"
+          echo "$LOCK_ID"
 
-    - name: Terraform Unlock
-      id: unlock_plan
-      uses: infrastructure/terraform-unlock@main
-      with:
-        output_file: ${GITHUB_WORKSPACE}/plan.out
+          echo "Attempting to unlock terraform state"
+          if terraform force-unlock --force "${LOCK_ID}"; then
+            echo "Terraform state has been successfully unlocked!"
+          else
+            echo "Failed to unlock the state." >&2
+            return 1
+          fi
+        elif [[ $ERROR_OUTPUT == *"Error:"* ]]; then
+          echo "Error occurred while checking Terraform state:" >&2
+          echo "$ERROR_OUTPUT" >&2
+          return 1
+        else
+          echo "State is not locked. No action needed."
+          terraform plan -no-color -var-file globals/globals.tfvars -var-file ${{ steps.get-label.outputs.environment }}/${{ steps.get-label.outputs.environment }}.tfvars -out=${GITHUB_WORKSPACE}/plan.tfplan
+          terraform show -no-color ${GITHUB_WORKSPACE}/plan.tfplan > ${GITHUB_WORKSPACE}/plan.out
+        fi
+      working-directory: terraform
 
     - name: Post plan outputs and update status check
       if: always() && !contains(github.event.comment.body, 'GithubDeploy')
@@ -315,12 +329,6 @@ runs:
       run: |
         terraform apply -auto-approve -no-color ${GITHUB_WORKSPACE}/plan.tfplan > ${GITHUB_WORKSPACE}/apply.out
       working-directory: terraform
-
-    - name: Terraform Unlock
-      id: unlock_apply
-      uses: infrastructure/terraform-unlock@main
-      with:
-        output_file: ${GITHUB_WORKSPACE}/apply.out
 
     - name: Post apply outputs and update status check
       if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, 'GithubDeploy') && always() }}
