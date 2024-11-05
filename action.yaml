@@ -225,7 +225,7 @@ runs:
       working-directory: terraform
 
     - name: Terraform Unlock
-      id: unlock
+      id: unlock_plan
       uses: infrastructure/terraform-unlock@main
       with:
         output_file: ${GITHUB_WORKSPACE}/plan.out
@@ -317,7 +317,7 @@ runs:
       working-directory: terraform
 
     - name: Terraform Unlock
-      id: unlock
+      id: unlock_apply
       uses: infrastructure/terraform-unlock@main
       with:
         output_file: ${GITHUB_WORKSPACE}/apply.out
