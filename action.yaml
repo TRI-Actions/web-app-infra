@@ -220,8 +220,8 @@ runs:
       id: plan
       shell: bash
       run: |
-        terraform plan -no-color -var-file globals/globals.tfvars -var-file ${{ steps.get-label.outputs.environment }}/${{ steps.get-label.outputs.environment }}.tfvars -out=${GITHUB_WORKSPACE}/plan.tfplan
-        terraform show -no-color ${GITHUB_WORKSPACE}/plan.tfplan > ${GITHUB_WORKSPACE}/plan.out
+        ERROR_OUTPUT=$(terraform plan -json -var-file globals/globals.tfvars -var-file ${{ steps.get-label.outputs.environment }}/${{ steps.get-label.outputs.environment }}.tfvars)
+        echo $ERROR_OUTPUT
       working-directory: terraform
 
     - name: Post plan outputs and update status check
