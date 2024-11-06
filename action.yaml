@@ -304,6 +304,9 @@ runs:
             repo: context.repo.repo,
             body: output
           })
+    - name: Sleep for 30 seconds
+      run: sleep 30s
+      shell: bash
 
     ##############################################
     #                                            #
@@ -360,6 +363,7 @@ runs:
             terraform apply -auto-approve -no-color ${GITHUB_WORKSPACE}/plan.tfplan > ${GITHUB_WORKSPACE}/apply.out
           fi
         }
+        check_lock
       working-directory: terraform
 
     - name: Post apply outputs and update status check
