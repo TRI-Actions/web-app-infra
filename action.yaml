@@ -231,6 +231,9 @@ runs:
             echo "Attempting to unlock terraform state"
             if terraform force-unlock --force "${LOCK_ID}"; then
               echo "Terraform state has been successfully unlocked!"
+              echo "Running plan again.."
+              terraform plan -no-color -var-file globals/globals.tfvars -var-file ${{ steps.get-label.outputs.environment }}/${{ steps.get-label.outputs.environment }}.tfvars -out=${GITHUB_WORKSPACE}/plan.tfplan
+              terraform show -no-color ${GITHUB_WORKSPACE}/plan.tfplan > ${GITHUB_WORKSPACE}/plan.out
             else
               echo "Failed to unlock the state."
               return 1
