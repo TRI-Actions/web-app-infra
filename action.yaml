@@ -304,9 +304,6 @@ runs:
             repo: context.repo.repo,
             body: output
           })
-    - name: Sleep for 30 seconds
-      run: sleep 30s
-      shell: bash
 
     ##############################################
     #                                            #
