@@ -336,7 +336,7 @@ runs:
       run: |
         set +e
         check_lock() {
-          ERROR_OUTPUT=$(terraform apply -auto-approve -json ${GITHUB_WORKSPACE}/plan.tfplan 2>&1)
+          ERROR_OUTPUT=$(terraform plan -json -var-file globals/globals.tfvars -var-file ${{ steps.get-label.outputs.environment }}/${{ steps.get-label.outputs.environment }}.tfvars 2>&1)
           if [[ $ERROR_OUTPUT == *"Error acquiring the state lock"* ]]; then
             LOCK_ID=$(echo $ERROR_OUTPUT | jq -r .diagnostic.detail | grep -A 1 "Lock Info" | awk '/ID:/ {print $2; exit}')
             echo "State is locked. Lock ID:"
