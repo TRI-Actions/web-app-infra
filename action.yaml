@@ -436,7 +436,7 @@ runs:
         path: app_build_scripts/after_scripts
       env:
         environment: ${{ steps.get-label.outputs.environment }}
-        triggeredByComment: ${{ github.event.issue.pull_request && 'True' || 'False' }}
+        triggeredByComment: ${{ contains(github.event.comment.body, 'GithubDeploy') }}
         
     - name: Post after script outputs and update status check
       if: steps.parse-yaml.outputs.app_build_after_terraform_enabled == 'true' && always() && (steps.after_scripts.conclusion == 'success' || steps.after_scripts.conclusion == 'failure')
