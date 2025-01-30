@@ -139,8 +139,8 @@ runs:
           }
           const run_url = process.env.GITHUB_SERVER_URL + '/' + process.env.GITHUB_REPOSITORY + '/actions/runs/' + process.env.GITHUB_RUN_ID
           const run_link = '<a href="' + run_url + '">logs</a>.'
-          const std_out = '${{ steps.before_scripts.outputs.stdout }}'.length > 65000 ? "...\n" + '${{ steps.before_scripts.outputs.stdout }}'.substring('${{ steps.before_scripts.outputs.stdout }}'.length - 65000) : '${{ steps.before_scripts.outputs.stdout }}'
-          const truncated_output = '${{ steps.before_scripts.outputs.stdout }}'.length > 65000 ? "Output is too long and was truncated. You can see the full output in " + run_link + "<br /><br />" : ""
+          const std_out = `${{ steps.before_scripts.outputs.stdout }}`.length > 65000 ? "...\n" + `${{ steps.before_scripts.outputs.stdout }}`.substring(`${{ steps.before_scripts.outputs.stdout }}`.length - 65000) : `${{ steps.before_scripts.outputs.stdout }}`
+          const truncated_output = `${{ steps.before_scripts.outputs.stdout }}`.length > 65000 ? "Output is too long and was truncated. You can see the full output in " + run_link + "<br /><br />" : ""
           github.rest.checks.update({
             owner: context.repo.owner,
             repo: context.repo.repo,
