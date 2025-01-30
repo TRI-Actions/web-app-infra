@@ -137,6 +137,10 @@ runs:
           const formatDate = () => {
             return new Date().toISOString()
           }
+          const run_url = process.env.GITHUB_SERVER_URL + '/' + process.env.GITHUB_REPOSITORY + '/actions/runs/' + process.env.GITHUB_RUN_ID
+          const run_link = '<a href="' + run_url + '">logs</a>.'
+          const std_out = '${{ steps.before_scripts.outputs.stdout }}'.length > 65000 ? "...\n" + '${{ steps.before_scripts.outputs.stdout }}'.substring('${{ steps.before_scripts.outputs.stdout }}'.length - 65000) : '${{ steps.before_scripts.outputs.stdout }}'
+          const truncated_output = '${{ steps.before_scripts.outputs.stdout }}'.length > 65000 ? "Output is too long and was truncated. You can see the full output in " + run_link + "<br /><br />" : ""
           github.rest.checks.update({
             owner: context.repo.owner,
             repo: context.repo.repo,
@@ -145,15 +149,16 @@ runs:
             completed_at: formatDate(),
             conclusion: '${{ steps.before_scripts.conclusion }}'
           })
-          const fs = require('fs')
+          
           const output = `Run [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
           #### Before Scripts Output 🖌
           <details><summary>Before Scripts Output</summary>
     
           ~~~
-          ${{ steps.before_scripts.outputs.stdout }}
+          ${std_out}
           ~~~
-    
+
+          ${truncated_output}
           </details>`;
 
           github.rest.issues.createComment({
