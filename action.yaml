@@ -52,7 +52,7 @@ runs:
         ssh-keyscan -t rsa github.shared-services.aws.tri.global >> ~/.ssh/known_hosts
     - name: Parse manifest file
       id: parse-yaml
-      uses: infrastructure/parse-yaml@v0.0.1
+      uses: TRI-IE/parse-yaml@v0.0.1
       with:
         file_path: manifest.yaml
 
@@ -122,7 +122,7 @@ runs:
     - name: Run scripts in before_scripts
       if: steps.parse-yaml.outputs.app_build_before_terraform_enabled == 'true'
       id: before_scripts
-      uses: infrastructure/run-script@main
+      uses: TRI-IE/run-script@main
       with:
         path: app_build_scripts/before_scripts
       env:
@@ -192,7 +192,7 @@ runs:
           })
           core.setOutput('CHECK_ID', check.data.id)
     - name: Setup Terraform
-      uses: infrastructure/setup-terraform@v0.0.1
+      uses: TRI-IE/setup-terraform@v0.0.1
       with:
         terraform_wrapper: true
 
@@ -436,7 +436,7 @@ runs:
     - name: Run scripts in after_scripts
       if: steps.parse-yaml.outputs.app_build_after_terraform_enabled == 'true'
       id: after_scripts
-      uses: infrastructure/run-script@main
+      uses: TRI-IE/run-script@main
       with:
         path: app_build_scripts/after_scripts
       env:
