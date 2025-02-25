@@ -23,7 +23,7 @@ jobs:
     ############## Test your branch by pushing to the test branch of this repo ############################
     steps:
       - name: Run Composite Module
-        uses: infrastructure/web-app-infra@test
+        uses: TRI-IE/web-app-infra@test
 
       - name: Terraform destroy
         if: always()
