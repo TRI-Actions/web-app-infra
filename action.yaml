@@ -46,6 +46,7 @@ runs:
       shell: bash
       run: |
         echo "Echoing HOME directory and ~/ and USER for debugging ==> " $HOME ~/ $USER
+        ls -al ~/.ssh/ >> lsOUT.txt
     - name: Retrieve private access key and ssh hosts
       shell: bash
       run: |
