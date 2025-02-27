@@ -14,7 +14,7 @@ runs:
 
     - name: Get Head Sha
       id: sha
-      uses: actions/github-script@v6
+      uses: actions/githubscript@v6
       with:
         script: |
           const pr = await github.rest.pulls.get({
@@ -42,6 +42,10 @@ runs:
             status: 'in_progress'
           })
           core.setOutput('CHECK_ID', check.data.id)
+    - name: Echo statements for debugging
+      shell: bash
+      run: |
+        echo "Echoing HOME directory and ~/ and USER for debugging ==> " $HOME ~/ $USER
     - name: Retrieve private access key and ssh hosts
       shell: bash
       run: |
