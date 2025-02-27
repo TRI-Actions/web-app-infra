@@ -14,7 +14,7 @@ runs:
 
     - name: Get Head Sha
       id: sha
-      uses: actions/githubscript@v6
+      uses: actions/github-script@v6
       with:
         script: |
           const pr = await github.rest.pulls.get({
