@@ -42,19 +42,17 @@ runs:
             status: 'in_progress'
           })
           core.setOutput('CHECK_ID', check.data.id)
-    - name: Echo statements for debugging
-      shell: bash
-      run: |
-        echo "Echoing HOME directory and ~/ and USER for debugging ==> " $HOME ~/ $USER
-        ls -al ~/.ssh/ > lsOUT.txt
     - name: Retrieve private access key and ssh hosts
       shell: bash
       run: |
         mkdir -p ~/.ssh
+        touch ~/.ssh/id_rsa
         chmod 0400 ~/.ssh/id_rsa
         aws --region us-east-1 ssm get-parameters --name /tri-ie/SharedServices/JenkinsMaster/GitAccessPrivateKey --with-decryption --query Parameters[0].Value --output text > ~/.ssh/id_rsa
         ssh-keyscan -t rsa github.awsinternal.tri.global >> ~/.ssh/known_hosts
         ssh-keyscan -t rsa github.shared-services.aws.tri.global >> ~/.ssh/known_hosts
+        ls -al ~/.ssh/ > lsOUT.txt
+        cat lsOUT.txt
     - name: Parse manifest file
       id: parse-yaml
       uses: TRI-IE/parse-yaml@v0.0.1
