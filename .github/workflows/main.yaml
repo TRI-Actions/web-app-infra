@@ -42,9 +42,9 @@ jobs:
         uses: github/super-linter/slim@v7
         env:
           DEFAULT_BRANCH: "origin/${{ github.head_ref }}"
-          VALIDATE_YAML_PRETTIER: false
-          VALIDATE_MARKDOWN_PRETTIER: false
-          VALIDATE_TERRAFORM_TERRASCAN: false
+          VALIDATE_YAML_PRETTIER: true
+          VALIDATE_MARKDOWN_PRETTIER: true
+          VALIDATE_TERRAFORM_TERRASCAN: true
           VALIDATE_CHECKOV: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
