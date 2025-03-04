@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   pipeline:
-    runs-on: codebuild-test-codebuild-runner-web-app-infra-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on: ubuntu-latest
     name: linting
     permissions: write-all
 

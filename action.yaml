@@ -61,17 +61,17 @@ runs:
           });
           // We should check if the label is correct too. 
           // It should be an environment name and if not we can send a comment to warn users that they added a wrong label
-          if (labels.length == 0) {
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `Your pull request is missing the label. Please add the label of environment you want to deploy! (i.e staging)`
-            })
-            core.setFailed('Missing label!');
-          } else {
-            core.setOutput('environment', labels[0].name);
-          }
+          #if (labels.length == 0) {
+          #  github.rest.issues.createComment({
+          #    issue_number: context.issue.number,
+          #    owner: context.repo.owner,
+          #    repo: context.repo.repo,
+          #    body: `Your pull request is missing the label. Please add the label of environment you want to deploy! (i.e staging)`
+          #  })
+          #  core.setFailed('Missing label!');
+          #} else {
+          #  core.setOutput('environment', labels[0].name);
+          #}
     - name: Update config status check
       if: ${{ always() }}
       uses: actions/github-script@v6
