@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   pipeline:
-    runs-on: ubuntu
+    runs-on: ubuntu-latest
     name: linting
     permissions: write-all
 
