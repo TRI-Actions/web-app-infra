@@ -1,6 +1,6 @@
 # web-app-infra
 
-## NOTICE - This repository was copied from <https://github.shared-services.aws.tri.global/infrastructure/web-app-infra> - ref: TRI-40381
+NOTICE - This repository was copied from <https://github.shared-services.aws.tri.global/infrastructure/web-app-infra> - ref: TRI-40381
 
 ## A custom GitHub Actions module for web-app-infra pipelines
 
