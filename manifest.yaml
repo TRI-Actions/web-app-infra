@@ -1,4 +1,4 @@
 build_config:
   # These are related to the general pipeline in .github/workflows/main.yaml
-  app_build_before_terraform_enabled: false
-  app_build_after_terraform_enabled: false
+  app_build_before_terraform_enabled: true
+  app_build_after_terraform_enabled: true
