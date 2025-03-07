@@ -15,6 +15,7 @@ runs:
         aws-region: us-east-1
           
     - name: Sign into Github.com and github enterprise
+      shell: bash
       run: |
         mkdir -p ~/.ssh/
         aws --region us-east-1 ssm get-parameters --name /tri-ie/SharedServices/JenkinsMaster/GitAccessPrivateKey --with-decryption --query Parameters[0].Value --output text > ~/.ssh/id_rsa
