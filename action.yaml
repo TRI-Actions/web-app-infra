@@ -7,6 +7,22 @@ branding:
 runs:
   using: composite
   steps:
+    - name: Sign into Shared Services
+      uses: aws-actions/configure-aws-credentials@main
+      with:
+        role-to-assume: arn:aws:iam::371027173325:role/GithubOIDCRole
+        role-session-name: github-actions-session
+        aws-region: us-east-1
+          
+    - name: Sign into Github.com and github enterprise
+      shell: bash
+      run: |
+        mkdir -p ~/.ssh/
+        aws --region us-east-1 ssm get-parameters --name /tri-ie/SharedServices/JenkinsMaster/GitAccessPrivateKey --with-decryption --query Parameters[0].Value --output text > ~/.ssh/id_rsa
+        chmod 0400 ~/.ssh/id_rsa
+      working-directory: ${{ github.workspace }}
+        
+
     - name: Check out repository code
       uses: actions/checkout@v3
       with:
