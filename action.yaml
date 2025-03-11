@@ -21,12 +21,14 @@ runs:
         aws --region us-east-1 ssm get-parameters --name /tri-ie/SharedServices/JenkinsMaster/GitAccessPrivateKey --with-decryption --query Parameters[0].Value --output text > ~/.ssh/id_rsa
         chmod 0400 ~/.ssh/id_rsa
       working-directory: ${{ github.workspace }}
-        
 
     - name: Check out repository code
       uses: actions/checkout@v3
       with:
         ref: ${{ github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || '' }}
+
+    - name: Run pre-commit checks
+      uses: pre-commit/action@v3.0.1
 
     - name: Get Head Sha
       id: sha
