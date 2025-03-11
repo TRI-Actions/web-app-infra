@@ -27,8 +27,10 @@ runs:
       with:
         ref: ${{ github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || '' }}
 
-    - name: Run pre-commit checks
-      uses: pre-commit/action@v3.0.1
+    - name: Setup Terraform
+      uses: TRI-IE/setup-terraform@v0.0.1
+      with:
+        terraform_wrapper: true
 
     - name: Get Head Sha
       id: sha
@@ -42,7 +44,7 @@ runs:
           });
           const headSha = pr.data.head.sha;
           core.setOutput('sha', headSha)
-    
+
     - name: Create  config status check
       uses: actions/github-script@v6
       id: config_status_check
@@ -66,6 +68,9 @@ runs:
       uses: TRI-IE/parse-yaml@v0.0.1
       with:
         file_path: manifest.yaml
+    
+    - name: Run pre-commit checks
+      uses: pre-commit/action@v3.0.1
 
     - name: Get label
       id: get-label
@@ -202,10 +207,6 @@ runs:
             status: 'in_progress'
           })
           core.setOutput('CHECK_ID', check.data.id)
-    - name: Setup Terraform
-      uses: TRI-IE/setup-terraform@v0.0.1
-      with:
-        terraform_wrapper: true
 
     - name: Setup env
       shell: bash
