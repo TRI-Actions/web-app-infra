@@ -13,7 +13,7 @@ runs:
         role-to-assume: arn:aws:iam::371027173325:role/GithubOIDCRole
         role-session-name: github-actions-session
         aws-region: us-east-1
-          
+
     - name: Sign into Github.com and github enterprise
       shell: bash
       run: |
@@ -62,13 +62,13 @@ runs:
             status: 'in_progress'
           })
           core.setOutput('CHECK_ID', check.data.id)
-          
+
     - name: Parse manifest file
       id: parse-yaml
       uses: TRI-IE/parse-yaml@v0.0.1
       with:
         file_path: manifest.yaml
-    
+
     - name: Run pre-commit checks
       uses: pre-commit/action@v3.0.1
 
@@ -82,7 +82,7 @@ runs:
             repo: context.repo.repo,
             issue_number: context.issue.number,
           });
-          // We should check if the label is correct too. 
+          // We should check if the label is correct too.
           // It should be an environment name and if not we can send a comment to warn users that they added a wrong label
           if (labels.length == 0) {
             github.rest.issues.createComment({
@@ -165,11 +165,11 @@ runs:
             completed_at: formatDate(),
             conclusion: '${{ steps.before_scripts.conclusion }}'
           })
-          
+
           const output = `Run [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
           #### Before Scripts Output 🖌
           <details><summary>Before Scripts Output</summary>
-    
+
           ~~~
           ${std_out}
           ~~~
@@ -220,13 +220,13 @@ runs:
       run: terraform fmt -check
       continue-on-error: false
       working-directory: terraform
-    
+
     - name: Terraform Init
       id: init
       shell: bash
       run: terraform init
       working-directory: terraform
-    
+
     - name: Terraform Validate
       id: validate
       shell: bash
@@ -295,21 +295,21 @@ runs:
           #### Terraform Initialization ⚙️ \`${{ steps.init.outcome }}\`
           #### Terraform Validation 🤖 \`${{ steps.validate.outcome }}\`
           <details><summary>Validation Output</summary>
-    
+
           ~~~
           ${{ steps.validate.outputs.stdout }}
           ~~~
-    
+
           </details>
-    
+
           #### Terraform Plan 📖 \`${{ steps.plan.outcome }}\`
-    
+
           <details><summary>Show Plan</summary>
-    
+
           ~~~
           ${plan}
           ~~~
-    
+
           </details>
 
           Respond with \`GithubDeploy\` to deploy and merge changes.
@@ -404,13 +404,13 @@ runs:
           const truncated_message = apply_out_file.length > 65000 ? "Output is too long and was truncated. You can see full apply output in " + run_link + "<br /><br />" : ""
           const output = `Run [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
           #### Terraform Apply 📖 \`${{ steps.apply.outcome }}\`
-    
+
           <details><summary>Show Apply Output</summary>
-    
+
           ~~~
           ${apply_out}
           ~~~
-    
+
           </details>
           ${truncated_message}`;
 
@@ -454,7 +454,7 @@ runs:
       env:
         environment: ${{ steps.get-label.outputs.environment }}
         triggeredByComment: ${{ contains(github.event.comment.body, 'GithubDeploy') }}
-        
+
     - name: Post after script outputs and update status check
       if: steps.parse-yaml.outputs.app_build_after_terraform_enabled == 'true' && always() && (steps.after_scripts.conclusion == 'success' || steps.after_scripts.conclusion == 'failure')
       uses: actions/github-script@v6
@@ -475,11 +475,11 @@ runs:
           const output = `Run [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
           #### After Scripts Output 🖌
           <details><summary>After Scripts Output</summary>
-          
+
           ~~~
           ${{ steps.after_scripts.outputs.stdout }}
           ~~~
-          
+
           </details>`;
           github.rest.issues.createComment({
             issue_number: context.issue.number,
@@ -497,4 +497,4 @@ runs:
               repo: context.repo.repo,
               pull_number: context.issue.number,
             });
-  
+

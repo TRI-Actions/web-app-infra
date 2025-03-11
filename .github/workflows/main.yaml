@@ -48,4 +48,4 @@ jobs:
           VALIDATE_CHECKOV: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      
+
