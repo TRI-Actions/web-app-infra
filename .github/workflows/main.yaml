@@ -1,11 +1,13 @@
-name: main_update
+name: Test-flow
 run-name: >-
-  ${{ github.event.issue.number && format('web_app_infra_update | PR-{0}', github.event.issue.number)
-  || 'web-app-infra Branch Update' }}
+  ${{ github.event.issue.number && format('test_flow | PR-{0}', github.event.issue.number)
+  || 'Test Deployment' }}
 
 permissions: read-all
 
 on:
+  issue_comment:
+    types: [created]
   pull_request:
     types: [opened, synchronize]
     branches: main
@@ -15,37 +17,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  pipeline:
+  test-pipeline:
     runs-on: ubuntu-latest
-    name: linting
+    name: test-workflow
     permissions: write-all
 
+
+    ############## Test your branch by pushing to the test branch of this repo ############################
     steps:
-      - name: Check out repository code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || '' }}
-          fetch-depth: 0
+      - name: Run Composite Module
+        uses: TRI-IE/web-app-infra@test
 
-      - name: Alert User to tests
-        uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: "If you would like to test your changes, comment `test` on your branch. Pipeline will pull the latest from branch `test`"
-            })
-
-      - name: Basic Linting
-        uses: github/super-linter/slim@v7
-        env:
-          DEFAULT_BRANCH: "origin/${{ github.head_ref }}"
-          VALIDATE_YAML_PRETTIER: false
-          VALIDATE_MARKDOWN_PRETTIER: false
-          VALIDATE_TERRAFORM_TERRASCAN: false
-          VALIDATE_CHECKOV: false
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
+      - name: Terraform destroy
+        if: always()
+        id: destroy
+        shell: bash
+        run: terraform destroy -auto-approve
+        continue-on-error: true
+        working-directory: terraform
