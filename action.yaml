@@ -70,6 +70,7 @@ runs:
         file_path: manifest.yaml
 
     - name: Run pre-commit checks
+      if: ${{ !contains(github.event.comment.body, 'GithubDeploy') }}
       uses: TRI-IE/pre-commit-checks@main
 
     - name: Get label
