@@ -44,7 +44,7 @@ runs:
         for key in "${ITEMS[@]}"; do
           aws --region us-east-1 ssm get-parameters --name "${key}" --with-decryption --query Parameters[0].Value --output text > ~/.ssh/id_rsa_${iter}
           chmod 600 ~/.ssh/id_rsa_${iter}
-          echo -e "Host github.com\n  IdentityFile ~/.ssh/id_rsa_${iter}\n  StrictHostKeyChecking no" >> ~/.ssh/config
+          echo -e "Host *\n  IdentityFile ~/.ssh/id_rsa_${iter}\n  StrictHostKeyChecking no" >> ~/.ssh/config
           iter=$((iter + 1))
         done
 
