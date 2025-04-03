@@ -7,7 +7,7 @@ branding:
 inputs:
   AWS_IAM_Role:
     description: 'Cross Account role arn to assume to deploy infrastructure'
-    required: true
+    required: false
     type: String
   SSM_private_keys:
     description: "comma separated list of ssm key locations, no spaces"
@@ -27,6 +27,7 @@ runs:
         ref: ${{ github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || '' }}
 
     - name: Sign into IAM Role
+      if: ${{ inputs.AWS_IAM_Role != '' }}
       uses: aws-actions/configure-aws-credentials@main
       with:
         role-to-assume: ${{ inputs.AWS_IAM_Role }}
