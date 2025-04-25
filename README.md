@@ -4,6 +4,22 @@
 
 This is a custom module for use by web-app repositories, such as kaleidoscope-deploy, htp-exp-deploy, and other repositories used by TRI.
 
+## Prerequisites
+
+
+## Action Functionality
+This Action executes a series of steps. 
+
+Step 1: Download terraform binary
+Step 2: Parse manifest file
+Step 3: Execute Pre-commit checks
+Step 4: Depending on manifest file settings, execute scripts in `app_build_scripts/before_scripts` directory
+Step 5: Execute Terraform Plan or Terraform Deploy if triggered by comment
+Step 6: Depending on manifest file settings, execute scripts in `app_build_scripts/after_scripts` directory
+Step 7: Alert users to any errors or potential deployment
+
+
+### Parameters
 There are three inputs with this repo:
 
 ```
@@ -22,12 +38,12 @@ AWS_IAM_Role:
 ```
 
 If no IAM role is set, it will use whatever is set by default.
-SSM_private keys can have multiple key locations separated by a comma. 
-SSM_pat can only use one personal access token location.
+SSM_private keys can have multiple key locations separated by a comma. Private keys are keys used to verify github repo retrieval.
+SSM_pat can only use one personal access token location. PAT is used to verify github retrieval.
 
-All variables can be omitted or used
+All variables can be omitted or used as needed.
 
-## How to use:
+## How to use in Github Actions Workflow:
 
 ```
 jobs:
