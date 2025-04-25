@@ -12,11 +12,11 @@ This Action executes a series of steps.
 
 Step 1: Download terraform binary  
 Step 2: Parse manifest file  
-Step 3: Execute Pre-commit checks
-Step 4: Depending on manifest file settings, execute scripts in `app_build_scripts/before_scripts` directory
-Step 5: Execute Terraform Plan or Terraform Deploy if triggered by comment
-Step 6: Depending on manifest file settings, execute scripts in `app_build_scripts/after_scripts` directory
-Step 7: Alert users to any errors or potential deployment
+Step 3: Execute Pre-commit checks  
+Step 4: Depending on manifest file settings, execute scripts in `app_build_scripts/before_scripts` directory  
+Step 5: Execute Terraform Plan or Terraform Deploy if triggered by comment  
+Step 6: Depending on manifest file settings, execute scripts in `app_build_scripts/after_scripts` directory  
+Step 7: Alert users to any errors or potential deployment  
 
 
 ### Parameters
