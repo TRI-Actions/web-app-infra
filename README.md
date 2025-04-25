@@ -5,6 +5,20 @@
 This is a custom module for use by web-app repositories, such as kaleidoscope-deploy, htp-exp-deploy, and other repositories used by TRI.
 
 ## Prerequisites
+There is a mandatory file structure as shown below. The staging file may be any name as long as it matches the name of the Pull Request tag. The files in app_build_scripts may be any file type, however it must not have extra parameters not contained within the file.
+
+```
+app_build_scripts
+├───before_scripts
+|   └───my_file_name.py
+└───after_scripts
+    └───my_other_file_name.py
+terraform
+├───globals
+|   └───globals.tfvars
+└───staging
+    └───staging.tfvars
+```
 
 
 ## Action Functionality
@@ -37,11 +51,11 @@ AWS_IAM_Role:
     type: String
 ```
 
-If no IAM role is set, it will use whatever is set by default.
-SSM_private keys can have multiple key locations separated by a comma. Private keys are keys used to verify github repo retrieval.
-SSM_pat can only use one personal access token location. PAT is used to verify github retrieval.
+If no IAM role is set, it will use whatever is set by default by the runner executing the deployment.
+SSM_private keys can have multiple key locations separated by a comma. Private keys are keys used to facilitate github repo retrieval.
+SSM_pat can only use one personal access token location. PAT is used to facilitate github repo retrieval.
 
-All variables can be omitted or used as needed.
+All parameters may be omitted or used as needed.
 
 ## How to use in Github Actions Workflow:
 
