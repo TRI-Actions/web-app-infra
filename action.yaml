@@ -54,7 +54,7 @@ runs:
           git config --global credential.helper store
         fi
       working-directory: ${{ github.workspace }}
-      env: 
+      env:
         SSM_PRIVATE_KEYS: ${{ inputs.SSM_private_keys }}
         SSM_PAT: ${{ inputs.SSM_pat }}
 
@@ -102,7 +102,7 @@ runs:
           } else {
             console.log(`✅ The branch '${head}' is up-to-date with 'main'.`);
           }
-          
+
     - name: Setup Terraform
       uses: TRI-Actions/setup-terraform@v0.0.1
       with:
