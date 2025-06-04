@@ -235,7 +235,7 @@ runs:
           }
           let logs = ''
           try {
-            logs = fs.readFileSync(${{ steps.before_scripts.outputs.log_path }}, 'utf8');
+            logs = fs.readFileSync('${{ steps.before_scripts.outputs.log_path }}', 'utf8');
           } catch (e) {
             logs = 'Failed to read log file.';
           }
@@ -548,7 +548,7 @@ runs:
         script: |
           let logs = ''
           try {
-            logs = fs.readFileSync(${{ steps.after_scripts.outputs.log_path }}, 'utf8');
+            logs = fs.readFileSync('${{ steps.after_scripts.outputs.log_path }}', 'utf8');
           } catch (e) {
             logs = 'Failed to read log file.';
           }
