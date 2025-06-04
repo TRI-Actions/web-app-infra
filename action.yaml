@@ -216,7 +216,7 @@ runs:
     - name: Run scripts in before_scripts
       if: steps.parse-yaml.outputs.app_build_before_terraform_enabled == 'true'
       id: before_scripts
-      uses: TRI-Actions/run-script@main
+      uses: TRI-Actions/run-script@Output_removed
       with:
         path: app_build_scripts/before_scripts
       env:
@@ -228,13 +228,21 @@ runs:
       uses: actions/github-script@v7
       with:
         script: |
+          const fs = require('fs');
+
           const formatDate = () => {
             return new Date().toISOString()
           }
+          let logs = ''
+          try {
+            logs = fs.readFileSync('run-script-logs', 'utf8');
+          } catch (e) {
+            logs = 'Failed to read log file.';
+          }
           const run_url = process.env.GITHUB_SERVER_URL + '/' + process.env.GITHUB_REPOSITORY + '/actions/runs/' + process.env.GITHUB_RUN_ID
           const run_link = '<a href="' + run_url + '">logs</a>.'
-          const std_out = `${{ steps.before_scripts.outputs.stdout }}`.length > 65000 ? "...\n" + `${{ steps.before_scripts.outputs.stdout }}`.substring(`${{ steps.before_scripts.outputs.stdout }}`.length - 65000) : `${{ steps.before_scripts.outputs.stdout }}`
-          const truncated_output = `${{ steps.before_scripts.outputs.stdout }}`.length > 65000 ? "Output is too long and was truncated. You can see the full output in " + run_link + "<br /><br />" : ""
+          const std_out = logs.length > 65000 ? "...\n" + logs.substring(logs.length - 65000) : logs
+          const truncated_output = logs.length > 65000 ? "Output is too long and was truncated. You can see the full output in " + run_link + "<br /><br />" : ""
           github.rest.checks.update({
             owner: context.repo.owner,
             repo: context.repo.repo,
@@ -526,7 +534,7 @@ runs:
     - name: Run scripts in after_scripts
       if: steps.parse-yaml.outputs.app_build_after_terraform_enabled == 'true'
       id: after_scripts
-      uses: TRI-Actions/run-script@main
+      uses: TRI-Actions/run-script@Output_removed
       with:
         path: app_build_scripts/after_scripts
       env:
@@ -538,6 +546,12 @@ runs:
       uses: actions/github-script@v7
       with:
         script: |
+          let logs = ''
+          try {
+            logs = fs.readFileSync('run-script-logs', 'utf8');
+          } catch (e) {
+            logs = 'Failed to read log file.';
+          }
           const formatDate = () => {
             return new Date().toISOString()
           }
@@ -555,7 +569,7 @@ runs:
           <details><summary>After Scripts Output</summary>
 
           ~~~
-          ${{ steps.after_scripts.outputs.stdout }}
+          ${logs}
           ~~~
 
           </details>`;
