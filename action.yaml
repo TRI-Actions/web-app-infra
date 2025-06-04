@@ -233,9 +233,10 @@ runs:
           const formatDate = () => {
             return new Date().toISOString()
           }
+          const logPath = '${{ steps.before_scripts.outputs.log_path }}';
           let logs = ''
           try {
-            logs = fs.readFileSync(`${{ steps.before_scripts.outputs.log_path }}`, 'utf8');
+            logs = fs.readFileSync(logPath, 'utf8');
           } catch (e) {
             logs = 'Failed to read log file.';
           }
