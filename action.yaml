@@ -223,10 +223,6 @@ runs:
         environment: ${{ steps.get-label.outputs.environment }}
         triggeredByComment: ${{ contains(github.event.comment.body, 'GithubDeploy') }}
 
-    - name: check_output
-      shell: bash
-      run: echo "${{ steps.before_scripts.outputs.log_path}}"
-
     - name: Post before script outputs and update status check
       if: steps.parse-yaml.outputs.app_build_before_terraform_enabled == 'true' && always() && (steps.before_scripts.conclusion == 'success' || steps.before_scripts.conclusion == 'failure')
       uses: actions/github-script@v7
