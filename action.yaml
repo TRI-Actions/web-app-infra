@@ -228,13 +228,22 @@ runs:
       uses: actions/github-script@v7
       with:
         script: |
+          const fs = require('fs');
+
           const formatDate = () => {
             return new Date().toISOString()
           }
+
+          let logs = ''
+          try {
+            logs = fs.readFileSync('${{ steps.before_scripts.outputs.log_path }}', 'utf8');
+          } catch (e) {
+            logs = 'Failed to read log file.';
+          }
           const run_url = process.env.GITHUB_SERVER_URL + '/' + process.env.GITHUB_REPOSITORY + '/actions/runs/' + process.env.GITHUB_RUN_ID
           const run_link = '<a href="' + run_url + '">logs</a>.'
-          const std_out = `${{ steps.before_scripts.outputs.stdout }}`.length > 65000 ? "...\n" + `${{ steps.before_scripts.outputs.stdout }}`.substring(`${{ steps.before_scripts.outputs.stdout }}`.length - 65000) : `${{ steps.before_scripts.outputs.stdout }}`
-          const truncated_output = `${{ steps.before_scripts.outputs.stdout }}`.length > 65000 ? "Output is too long and was truncated. You can see the full output in " + run_link + "<br /><br />" : ""
+          const std_out = logs.length > 65000 ? "...\n" + logs.substring(logs.length - 65000) : logs
+          const truncated_output = logs.length > 65000 ? "Output is too long and was truncated. You can see the full output in " + run_link + "<br /><br />" : ""
           github.rest.checks.update({
             owner: context.repo.owner,
             repo: context.repo.repo,
@@ -424,6 +433,7 @@ runs:
             status: 'in_progress'
           })
           core.setOutput('CHECK_ID', check.data.id)
+
     - name: Terraform - Apply
       if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, 'GithubDeploy') }}
       id: apply
@@ -523,6 +533,7 @@ runs:
             status: 'in_progress'
           })
           core.setOutput('CHECK_ID', check.data.id)
+          
     - name: Run scripts in after_scripts
       if: steps.parse-yaml.outputs.app_build_after_terraform_enabled == 'true'
       id: after_scripts
@@ -538,6 +549,13 @@ runs:
       uses: actions/github-script@v7
       with:
         script: |
+          const fs = require('fs');
+          let logs = ''
+          try {
+            logs = fs.readFileSync('${{ steps.after_scripts.outputs.log_path }}', 'utf8');
+          } catch (e) {
+            logs = 'Failed to read log file.';
+          }
           const formatDate = () => {
             return new Date().toISOString()
           }
@@ -549,13 +567,12 @@ runs:
             completed_at: formatDate(),
             conclusion: '${{ steps.after_scripts.conclusion }}'
           })
-          const fs = require('fs')
           const output = `Run [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
           #### After Scripts Output 🖌
           <details><summary>After Scripts Output</summary>
 
           ~~~
-          ${{ steps.after_scripts.outputs.stdout }}
+          ${logs}
           ~~~
 
           </details>`;
