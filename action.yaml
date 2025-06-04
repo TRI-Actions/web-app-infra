@@ -216,7 +216,7 @@ runs:
     - name: Run scripts in before_scripts
       if: steps.parse-yaml.outputs.app_build_before_terraform_enabled == 'true'
       id: before_scripts
-      uses: TRI-Actions/run-script@Output_removed
+      uses: TRI-Actions/run-script@main
       with:
         path: app_build_scripts/before_scripts
       env:
@@ -537,7 +537,7 @@ runs:
     - name: Run scripts in after_scripts
       if: steps.parse-yaml.outputs.app_build_after_terraform_enabled == 'true'
       id: after_scripts
-      uses: TRI-Actions/run-script@Output_removed
+      uses: TRI-Actions/run-script@main
       with:
         path: app_build_scripts/after_scripts
       env:
