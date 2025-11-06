@@ -72,11 +72,11 @@ runs:
         if [[ -n "${JFROG_USER}" && -n "${JFROG_TOKEN}" ]]; then
           ARTIFACTORY_USER=$(aws --region us-east-1 ssm get-parameters --name "${JFROG_USER}" --with-decryption --query Parameters[0].Value --output text)
           ARTIFACTORY_TOKEN=$(aws --region us-east-1 ssm get-parameters --name "${JFROG_TOKEN}" --with-decryption --query Parameters[0].Value --output text)
-          cat <<-EOF > ~/.netrc
-          machine toyotaresearchinstitute.jfrog.io
-            login ${ARTIFACTORY_USER}
-            password ${ARTIFACTORY_TOKEN}
-          EOF
+          cat <<EOF > ~/.netrc
+machine toyotaresearchinstitute.jfrog.io
+  login ${ARTIFACTORY_USER}
+  password ${ARTIFACTORY_TOKEN}
+EOF
           chmod 600 ~/.netrc
         fi
       working-directory: ${{ github.workspace }}
