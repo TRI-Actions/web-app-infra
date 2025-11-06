@@ -17,6 +17,14 @@ inputs:
     description: "Location of pat token in SSM"
     required: false
     type: String
+  JFrog_user:
+    description: "Location of JFrog Username in SSM"
+    required: false
+    type: String
+  JFrog_Token:
+    description: "Location of JFrog Token in SSM"
+    required: false
+    type: String
 
 runs:
   using: composite
@@ -57,6 +65,25 @@ runs:
       env:
         SSM_PRIVATE_KEYS: ${{ inputs.SSM_private_keys }}
         SSM_PAT: ${{ inputs.SSM_pat }}
+
+    - name: Set up JFrog config
+      shell: bash
+      run: |
+        if [[ -n "${JFROG_USER}" && -n "${JFROG_TOKEN}" ]]; then
+          ARTIFACTORY_USER=$(aws --region us-east-1 ssm get-parameters --name "${JFROG_USER}" --with-decryption --query Parameters[0].Value --output text)
+          ARTIFACTORY_TOKEN=$(aws --region us-east-1 ssm get-parameters --name "${JFROG_TOKEN}" --with-decryption --query Parameters[0].Value --output text)
+          cat <<EOF > ~/.netrc
+          machine toyotaresearchinstitute.jfrog.io
+            login ${ARTIFACTORY_USER}
+            password ${ARTIFACTORY_TOKEN}
+          EOF
+          chmod 600 ~/.netrc
+        fi
+      working-directory: ${{ github.workspace }}
+      env:
+        JFROG_USER: ${{ inputs.JFrog_user }}
+        JFROG_TOKEN: ${{ inputs.JFrog_Token }}
+
 
     - name: Check if current branch is behind main
       uses: actions/github-script@v7
