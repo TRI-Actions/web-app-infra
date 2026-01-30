@@ -5,10 +5,6 @@ branding:
   color: 'blue'
 
 inputs:
-  AWS_IAM_Role:
-    description: 'Cross Account role arn to assume to deploy infrastructure'
-    required: false
-    type: String
   SSM_private_keys:
     description: "comma separated list of ssm key locations, no spaces"
     required: false
@@ -25,6 +21,10 @@ inputs:
     description: "Location of JFrog Token in SSM"
     required: false
     type: String
+  Target_Account:
+    description: "Target AWS account id"
+    required: true
+    type: string
 
 runs:
   using: composite
@@ -35,12 +35,9 @@ runs:
         ref: ${{ github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || '' }}
 
     - name: Sign into IAM Role
-      if: ${{ inputs.AWS_IAM_Role != '' }}
       uses: TRI-Actions/get-aws-credentials@v1
       with:
-        role-to-assume: ${{ inputs.AWS_IAM_Role }}
-        role-session-name: web-app-infra-session
-        aws-region: us-east-1
+        account-id: ${{ inputs.Target_Account }}
 
     - name: Sign into Github.com and github enterprise
       shell: bash
