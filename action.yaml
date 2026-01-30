@@ -25,6 +25,8 @@ inputs:
     description: "Target AWS account id"
     required: true
     type: string
+  Target_Role_Name:
+    description: "Cross account role to assume on target account"
 
 runs:
   using: composite
@@ -38,6 +40,7 @@ runs:
       uses: TRI-Actions/get-aws-credentials@v1
       with:
         account-id: ${{ inputs.Target_Account }}
+        target-role-name: ${{ inputs.Target_Role_Name }}
 
     - name: Sign into Github.com and github enterprise
       shell: bash
