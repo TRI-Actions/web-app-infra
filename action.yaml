@@ -557,7 +557,7 @@ runs:
             status: 'in_progress'
           })
           core.setOutput('CHECK_ID', check.data.id)
-          
+
     - name: Run scripts in after_scripts
       if: steps.parse-yaml.outputs.app_build_after_terraform_enabled == 'true'
       id: after_scripts
