@@ -36,7 +36,7 @@ runs:
 
     - name: Sign into IAM Role
       if: ${{ inputs.AWS_IAM_Role != '' }}
-      uses: aws-actions/configure-aws-credentials@v4.1.0
+      uses: TRI-Actions/get-aws-credentials@v1
       with:
         role-to-assume: ${{ inputs.AWS_IAM_Role }}
         role-session-name: web-app-infra-session
