@@ -27,6 +27,9 @@ inputs:
     type: string
   Target_Role_Name:
     description: "Cross account role to assume on target account"
+    required: false
+    default: DefaultCrossAccountRole
+    type: string
 
 runs:
   using: composite
