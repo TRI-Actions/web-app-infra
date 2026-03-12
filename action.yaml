@@ -34,30 +34,6 @@ runs:
       with:
         ref: ${{ github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || '' }}
 
-    - name: Sign into IAM Role
-      if: ${{ inputs.AWS_IAM_Role != '' }}
-      shell: bash
-      run: |
-        CREDS=$(aws sts assume-role \
-          --role-arn ${{ inputs.AWS_IAM_Role }} \
-          --role-session-name web-app-infra-session)
-
-        AWS_ACCESS_KEY_ID=$(echo $CREDS | jq -r '.Credentials.AccessKeyId')
-        AWS_SECRET_ACCESS_KEY=$(echo $CREDS | jq -r '.Credentials.SecretAccessKey')
-        AWS_SESSION_TOKEN=$(echo $CREDS | jq -r '.Credentials.SessionToken')
-
-        # Export for subsequent steps
-        {
-          echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
-          echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
-          echo "AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN"
-        } >> $GITHUB_ENV
-
-        # Mask sensitive values in logs
-        echo "::add-mask::$AWS_ACCESS_KEY_ID"
-        echo "::add-mask::$AWS_SECRET_ACCESS_KEY"
-        echo "::add-mask::$AWS_SESSION_TOKEN"
-
     - name: Sign into Github.com and github enterprise
       shell: bash
       run: |
@@ -96,6 +72,30 @@ runs:
       env:
         JFROG_USER: ${{ inputs.JFrog_user }}
         JFROG_TOKEN: ${{ inputs.JFrog_Token }}
+
+    - name: Sign into IAM Role
+      if: ${{ inputs.AWS_IAM_Role != '' }}
+      shell: bash
+      run: |
+        CREDS=$(aws sts assume-role \
+          --role-arn ${{ inputs.AWS_IAM_Role }} \
+          --role-session-name web-app-infra-session)
+
+        AWS_ACCESS_KEY_ID=$(echo $CREDS | jq -r '.Credentials.AccessKeyId')
+        AWS_SECRET_ACCESS_KEY=$(echo $CREDS | jq -r '.Credentials.SecretAccessKey')
+        AWS_SESSION_TOKEN=$(echo $CREDS | jq -r '.Credentials.SessionToken')
+
+        # Export for subsequent steps
+        {
+          echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
+          echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
+          echo "AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN"
+        } >> $GITHUB_ENV
+
+        # Mask sensitive values in logs
+        echo "::add-mask::$AWS_ACCESS_KEY_ID"
+        echo "::add-mask::$AWS_SECRET_ACCESS_KEY"
+        echo "::add-mask::$AWS_SESSION_TOKEN"
 
 
     - name: Check if current branch is behind main
