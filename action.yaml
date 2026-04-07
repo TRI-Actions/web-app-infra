@@ -5,8 +5,17 @@ branding:
   color: 'blue'
 
 inputs:
+  Target_Account:
+    description: "Target AWS account id (required for GitHub.com runners using federated OIDC login)"
+    required: false
+    type: string
+  Target_Role_Name:
+    description: "Cross account role to assume on target account (used with Target_Account)"
+    required: false
+    default: DefaultCrossAccountRole
+    type: string
   AWS_IAM_Role:
-    description: 'Cross Account role arn to assume to deploy infrastructure'
+    description: "Full IAM role ARN for cross-account access (optional, for CodeBuild runners needing cross-account)"
     required: false
     type: String
   SSM_private_keys:
@@ -34,13 +43,52 @@ runs:
       with:
         ref: ${{ github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || '' }}
 
-    - name: Sign into IAM Role
-      if: ${{ inputs.AWS_IAM_Role != '' }}
-      uses: aws-actions/configure-aws-credentials@v4.1.0
+    ##############################################
+    #                                            #
+    #            AWS Authentication              #
+    #                                            #
+    ##############################################
+
+    # Path 1: GitHub.com runners — federated OIDC login via target account ID
+    - name: Sign into IAM Role (federated)
+      if: ${{ inputs.Target_Account != '' }}
+      uses: TRI-Actions/get-aws-credentials@v1
       with:
-        role-to-assume: ${{ inputs.AWS_IAM_Role }}
-        role-session-name: web-app-infra-session
-        aws-region: us-east-1
+        account-id: ${{ inputs.Target_Account }}
+        target-role-name: ${{ inputs.Target_Role_Name }}
+
+    # Path 2: CodeBuild runners — optional STS assume-role for cross-account access
+    - name: Sign into IAM Role (STS)
+      if: ${{ inputs.Target_Account == '' && inputs.AWS_IAM_Role != '' }}
+      shell: bash
+      run: |
+        CREDS=$(aws sts assume-role \
+          --role-arn ${{ inputs.AWS_IAM_Role }} \
+          --role-session-name web-app-infra-session)
+
+        AWS_ACCESS_KEY_ID=$(echo $CREDS | jq -r '.Credentials.AccessKeyId')
+        AWS_SECRET_ACCESS_KEY=$(echo $CREDS | jq -r '.Credentials.SecretAccessKey')
+        AWS_SESSION_TOKEN=$(echo $CREDS | jq -r '.Credentials.SessionToken')
+
+        # Export for subsequent steps
+        {
+          echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
+          echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
+          echo "AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN"
+        } >> $GITHUB_ENV
+
+        # Mask sensitive values in logs
+        echo "::add-mask::$AWS_ACCESS_KEY_ID"
+        echo "::add-mask::$AWS_SECRET_ACCESS_KEY"
+        echo "::add-mask::$AWS_SESSION_TOKEN"
+
+    # Path 3: CodeBuild runners with no cross-account need — runner's existing credentials are used as-is
+
+    ##############################################
+    #                                            #
+    #            Git & Artifact Auth             #
+    #                                            #
+    ##############################################
 
     - name: Sign into Github.com and github enterprise
       shell: bash
@@ -81,6 +129,11 @@ runs:
         JFROG_USER: ${{ inputs.JFrog_user }}
         JFROG_TOKEN: ${{ inputs.JFrog_Token }}
 
+    ##############################################
+    #                                            #
+    #            Checks & Config                 #
+    #                                            #
+    ##############################################
 
     - name: Check if current branch is behind main
       uses: actions/github-script@v7
@@ -114,17 +167,17 @@ runs:
             head,
           });
 
-          if (result.data.status === 'behind') {
-            const output = `❌ The branch '${head}' is behind '${base}' by ${result.data.behind_by} commit(s). Please perform git pull to merge branch with ${base}`
+          if (result.data.status === 'behind' || result.data.status === 'diverged') {
+            const output = `❌ The branch '${head}' is behind 'main' by ${result.data.behind_by} commit(s). Please perform git pull to merge branch with main`
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: output
             })
-            core.setFailed(`❌ The branch '${head}' is behind '${base}' by ${result.data.behind_by} commit(s). Please perform git pull to merge branch with ${base}`);
+            core.setFailed(`❌ The branch '${head}' is behind 'main' by ${result.data.behind_by} commit(s). Please perform git pull to merge branch with main`);
           } else {
-            console.log(`✅ The branch '${head}' is up-to-date with '${base}'.`);
+            console.log(`✅ The branch '${head}' is up-to-date with 'main'.`);
           }
 
     - name: Setup Terraform
@@ -557,7 +610,7 @@ runs:
             status: 'in_progress'
           })
           core.setOutput('CHECK_ID', check.data.id)
-          
+
     - name: Run scripts in after_scripts
       if: steps.parse-yaml.outputs.app_build_after_terraform_enabled == 'true'
       id: after_scripts
